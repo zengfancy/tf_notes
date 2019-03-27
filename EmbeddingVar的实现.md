@@ -12,15 +12,27 @@ public:
   int64_t emb_len_;
 };
 
+// 直接用unordered map
 class HashEmbeddingVar : public LookupableEmbeddingVar {
+public:
+  virtual void GetTensor(T key, float** data) = 0;
+  virtual void PutTensor(T key, float* tensor, UpdateFunc func) = 0;
 private:
   std::unordered_map<T, Tensor> tensor_map_;
 };
 
+// 用经典的hash方法，数组的方式实现
+// 给定一个key, hash到一个slot中去，在当前slot中查找key，如果查中则返回，如果查不中，则slot + 1，依次循环，直到遇到empty_key为止
 class DenseEmbeddingVar : public LookupableEmbeddingVar {
+public:
+  virtual void GetTensor(T key, float** data);
+  virtual void PutTensor(T key, float* tensor, UpdateFunc func);
 private:
-  
+  PersistentTensor keys_;
+  PersistentTensor values_;
 };
+
+class 
 
 ```
 
