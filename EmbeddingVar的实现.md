@@ -32,12 +32,17 @@ private:
   PersistentTensor values_;
 };
 
-class 
+class DenseEmbeddingVar2 : public LookupableEmbeddingVar {
+private:
+  PersistentTensor first_keys_;
+  PersistentTensor keys_;
+  PersistentTensor values_;
+  PersistentTensor next_;
+};
 
 ```
 
 * EmbeddingLookupOp & EmbeddingUpdateOp 的单机实现
-
 
 ```cpp
          ^
