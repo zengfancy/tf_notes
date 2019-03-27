@@ -132,3 +132,22 @@ public:
              |     |        
 ```
 
+```cpp
+class EmbeddingKeyDedupOp : public OpKernel {
+public:
+  void Compute(OpKernelContext* context) {
+  }
+};
+
+class EmbeddingDuplicateOp : public OpKernel {
+public:
+  void Compute(OpKernelContext* context) {
+  }
+};
+
+class EmbeddingGradReduceOp : public OpKernel {
+public:
+  void Compute(OpKernelContext* context) {
+  }
+};
+```
