@@ -151,3 +151,30 @@ public:
   }
 };
 ```
+
+* Import & Export
+
+```cpp
+             ^     ^
+ key_tensor  |     | val_tensor
+             |     |
+        ExportEmbeddingOp
+        
+        
+        ImportEmbeddingOp
+             ^     ^
+ key_tensor  |     | val_tensor
+             |     |      
+             
+class ImportEmbeddingOp : public OpKernel {
+public:
+  void Compute(OpKernelContext* context) {
+  }
+};
+
+class ExportEmbeddingOp : public OpKernel {
+public:
+  void Compute(OpKernelContext* context) {
+  }
+};
+```
