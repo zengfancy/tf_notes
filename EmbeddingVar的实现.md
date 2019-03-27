@@ -13,6 +13,7 @@ public:
 };
 
 // 直接用unordered map
+// 缺点：内存散乱，访问性能差
 class HashEmbeddingVar : public LookupableEmbeddingVar {
 public:
   virtual void GetEmbedding(T key, float** data) = 0;
@@ -23,6 +24,8 @@ private:
 
 // 用经典的hash方法，数组的方式实现
 // 给定一个key, hash到一个slot中去，在当前slot中查找key，如果查中则返回，如果查不中，则slot + 1，依次循环，直到遇到empty_key为止
+// hash数组的 capacity 是动态增长的，一般来说 capacity 应该为 2^n - 1, 当 capacity < length * factor 时，capacity应该倍增
+// 但是这种结构的 value 数组的长度必须跟 keys 数组的长度一致，有浪费空间之嫌
 class DenseEmbeddingVar : public LookupableEmbeddingVar {
 public:
   virtual void GetEmbedding(T key, float** data);
@@ -32,6 +35,7 @@ private:
   PersistentTensor values_;
 };
 
+// 优势：内存使用效率高，访问速度也很快
 class DenseEmbeddingVar2 : public LookupableEmbeddingVar {
 public:
   virtual void GetEmbedding(T key, float** data);
