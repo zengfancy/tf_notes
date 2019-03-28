@@ -1,6 +1,7 @@
 
 # 变量体系
 
+* Variable
 ```python
 class VariableV1(Variable):
 
@@ -12,4 +13,10 @@ class RefVariable(VariableV1):
               name=name)
               
 class 
+```
+* ResourceVariable
+```python
+
+class ResourceVariable(VariableV1):
+
 ```
