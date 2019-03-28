@@ -1,4 +1,5 @@
 
+## OpKernel 的实现
 
 * LookupableEmbeddingVar 的定义
 
@@ -178,3 +179,9 @@ public:
   }
 };
 ```
+
+## Ops 的实现
+
+## Python 层的实现
+
+## 梯度更新相关
