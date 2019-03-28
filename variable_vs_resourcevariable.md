@@ -1,5 +1,5 @@
 
-# 变量体系
+## 变量体系
 
 * Variable
 ```python
@@ -38,7 +38,7 @@ class ResourceVariable(VariableV1):
     return gen_resource_variable_ops.read_variable_op(self._handle, self._dtype)
 ```
 
-# 梯度更新
+## 梯度更新
 
 * Variable's grad update
 
@@ -59,6 +59,7 @@ class GradientDescentOptimizer(optimizer.Optimizer):
 ```
 
 ```cpp
+// 以下两个Op其实用的都是同一个OpKernel : ApplyGradientDescentOp
 REGISTER_OP("ApplyGradientDescent")
     .Input("var: Ref(T)")
     .Input("alpha: T")
