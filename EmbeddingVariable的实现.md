@@ -67,7 +67,7 @@ private:
          ^
          |  val_tensor
          |
-    EmbeddingLookUpOp 
+    EmbeddingLookUpOp   < ----  handle
          ^
          |  key_tensor
          |
@@ -75,7 +75,8 @@ private:
    
 // no output for update
 
-         EmbeddingUpdateOp
+
+         EmbeddingUpdateOp   < ----  handle
              ^     ^
  key_tensor  |     | val_tensor
              |     |
@@ -111,10 +112,10 @@ public:
 ```
 
 * EmbeddingLookup & EmbeddingUpdate 的分布式PS实现
-  + EmbeddingKeyDedupOp : 将 key 去重
-  + EmbeddingDuplicateOp : 反去重
+  + EmbeddingKeyDedupOp : 将 key 去重, Tensorflow似乎已经有实现
+  + EmbeddingDuplicateOp : 反去重, Tensorflow似乎已经有实现
   + EmbeddingLookUpOp : 和单机版的 EmbeddingLookUpOp 一样
-  + EmbeddingGradReduceOp : 将 key 去重，并 reduce grad value
+  + EmbeddingGradReduceOp : 将 key 去重，并 reduce grad value, Tensorflow似乎已经有实现
   + EmbeddingUpdateOp : 和单机版的 EmbeddingUpdateOp 一样
 
 
