@@ -154,7 +154,7 @@ public:
 };
 ```
 
-## 导入导出的实现
+## 导入导出OpKernel的实现
 
 * Import & Export
 
@@ -203,6 +203,8 @@ public:
 * 修改variable_scope.py，支持从get_variable()函数得到一个EmbeddingVariable
   
 * 修改embedding_lookup函数，复用其中的逻辑
+
+* 导入导出相关
 
 ## 梯度更新相关
 * 有关 Variable, ResourceVariable 的梯度更新可以参考 https://github.com/zengfancy/tf_notes/blob/master/Variable_vs_Resourcevariable.md
