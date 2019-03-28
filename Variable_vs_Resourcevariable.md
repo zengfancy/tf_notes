@@ -43,6 +43,23 @@ class ResourceVariable(VariableV1):
 * Variable's grad update
 
 ```python
+class _RefVariableProcessor(_OptimizableVariable):
+  def update_op(self, optimizer, g):
+    if isinstance(g, ops.Tensor):
+      return optimizer._apply_dense(g, self._v)
+    else:
+      return optimizer._apply_sparse_duplicate_indices(g, self._v)
+      
+class _DenseResourceVariableProcessor(_OptimizableVariable):
+  def update_op(self, optimizer, g):
+    if isinstance(g, ops.IndexedSlices):
+      return optimizer._resource_apply_sparse_duplicate_indices(
+          g.values, self._v, g.indices)
+    else:
+      return optimizer._resource_apply_dense(g, self._v)
+```
+
+```python
 class GradientDescentOptimizer(optimizer.Optimizer):
   def _apply_dense(self, grad, var):
     return training_ops.apply_gradient_descent(
@@ -72,6 +89,26 @@ class GradientDescentOptimizer(optimizer.Optimizer):
 ```
 
 ```cpp
+// ResourceScatterUpdateOp
+REGISTER_OP("ResourceScatterAdd")
+    .Input("resource: resource")
+    .Input("indices: Tindices")
+    .Input("updates: dtype")
+    .Attr("dtype: numbertype")
+    .Attr("Tindices: {int32, int64}")
+    .SetShapeFn(ResourceScatterUpdateShape);
+    
+// ScatterUpdateOp
+REGISTER_OP("ScatterAdd")
+    .Input("ref: Ref(T)")
+    .Input("indices: Tindices")
+    .Input("updates: T")
+    .Output("output_ref: Ref(T)")
+    .Attr("T: numbertype")
+    .Attr("Tindices: {int32, int64}")
+    .Attr("use_locking: bool = false")
+    .SetShapeFn(ScatterUpdateShape);    
+    
 // 以下两个Op其实用的都是同一个OpKernel : ApplyGradientDescentOp
 REGISTER_OP("ApplyGradientDescent")
     .Input("var: Ref(T)")
