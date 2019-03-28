@@ -58,7 +58,7 @@ class GradientDescentOptimizer(optimizer.Optimizer):
         grad, use_locking=self._use_locking)
         
   def _resource_apply_sparse_duplicate_indices(self, grad, handle, indices):
-    // 最后调用了一个OpKernel : ResourceScatterUpdateOp
+    # 最后调用了一个OpKernel : ResourceScatterUpdateOp
     return resource_variable_ops.resource_scatter_add(
         handle.handle, indices, -grad * self._learning_rate)
 
@@ -67,7 +67,7 @@ class GradientDescentOptimizer(optimizer.Optimizer):
         grad.values *
         math_ops.cast(self._learning_rate_tensor, var.dtype.base_dtype),
         grad.indices, grad.dense_shape)
-    // 最后调用了一个OpKernel : ScatterUpdateOp
+    # 最后调用了一个OpKernel : ScatterUpdateOp
     return var.scatter_sub(delta, use_locking=self._use_locking)
 ```
 
