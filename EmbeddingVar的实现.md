@@ -182,6 +182,14 @@ public:
 
 ## Ops 的实现
 
+* EmbeddingLookup ：查找，输入key，返回value
+* EmbeddingUpdate ：更新, 输入key, grad，无返回
+* EmbeddingKeyDedup ：key去重，输入key, 返回去重后的key
+* EmbeddingDuplicate ：key, value反去重，输入key1, key2, value, 返回duplicate之后的value
+* EmbeddingGradReduce ：key去重，并将grad合并,输入key, grad,返回合并后的key, grad
+* ExportEmbedding ：导出
+* ImportEmbedding ：导入
+
 ## Python 层的实现
 
 ## 梯度更新相关
