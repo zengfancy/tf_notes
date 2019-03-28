@@ -194,7 +194,7 @@ public:
 * ImportEmbedding ：导入
 
 ## Python 层的实现
-
+* 有关 Variable, ResourceVariable 的实现可以参考 https://github.com/zengfancy/tf_notes/blob/master/Variable_vs_Resourcevariable.md
 * EmbeddingVariable
   + 从ResourceVariable继承
   + 实现其init_from_proto, init_from_args
@@ -205,6 +205,6 @@ public:
 * 修改embedding_lookup函数，复用其中的逻辑
 
 ## 梯度更新相关
-
+* 有关 Variable, ResourceVariable 的梯度更新可以参考 https://github.com/zengfancy/tf_notes/blob/master/Variable_vs_Resourcevariable.md
 * 添加一个名叫 KvResourceVariableProcessor 的 _OptimizerVariable
 * 给 Optimizer 添加两个函数 _kv_resource_apply_sparse_duplicate_indices 与 _resource_apply_sparse，默认不实现，由子类来实现
