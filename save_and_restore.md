@@ -169,4 +169,4 @@ class SavedModelBuilder(object):
     file_io.write_string_to_file(path, str(self._saved_model))
 ```
 
-* 导出到 proto : tensorflow 中导出 variable 的时候是将它转换成一个 constant op 导出的。阿里的做法只有导出到 odps 表格，没有实现导出到 proto 模型的做法
+* 导出到 proto : tensorflow 中导出 variable 的时候是将它转换成一个 constant op 导出的。阿里的做法只有导出到 odps 表格，函数名叫store_embedding_variable_to_table，没有实现导出到 proto 模型的做法
