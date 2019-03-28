@@ -1,6 +1,7 @@
 
 ## OpKernel 的实现
 
+* EmbeddingVariable的OpKernel实现ResourceVariable 的 OpKernel实现
 * LookupableEmbeddingVar 的定义
 
 ```cpp
@@ -153,6 +154,8 @@ public:
 };
 ```
 
+## 导入导出的实现
+
 * Import & Export
 
 ```cpp
@@ -183,7 +186,7 @@ public:
 ## Ops 的实现
 
 * EmbeddingLookup ：查找，输入key，返回value
-* EmbeddingUpdate ：更新, 输入key, grad，无返回
+* EmbeddingUpdate ：更新, 输入key, grad，无返回, 这个Op用于SGD算法的梯度更新，Adam, AdaGrad等复杂更新算法需要额外的Op才能完成
 * EmbeddingKeyDedup ：key去重，输入key, 返回去重后的key
 * EmbeddingDuplicate ：key, value反去重，输入key1, key2, value, 返回duplicate之后的value
 * EmbeddingGradReduce ：key去重，并将grad合并,输入key, grad,返回合并后的key, grad
@@ -191,5 +194,14 @@ public:
 * ImportEmbedding ：导入
 
 ## Python 层的实现
+
+* EmbeddingVariable
+  + 从ResourceVariable继承
+  + 实现其init_from_proto, init_from_args
+  + 其他逻辑如 read_value, read, sparse_read 参考 ResourceVariable的实现
+  
+* 修改variable_scope.py，支持从get_variable()函数得到一个EmbeddingVariable
+  
+* 修改embedding_lookup函数，复用其中的逻辑
 
 ## 梯度更新相关
