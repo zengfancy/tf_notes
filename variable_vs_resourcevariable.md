@@ -18,5 +18,22 @@ class
 ```python
 
 class ResourceVariable(VariableV1):
-
+  def __init__:
+    self._handle = gen_resource_variable_ops.var_handle_op(shape=shape, dtype=dtype,
+                        shared_name=shared_name,
+                        name=name,
+                        container=container)
+    self._initializer_op = (
+                  gen_resource_variable_ops.assign_variable_op(
+                      self._handle,
+                      variables._try_guard_against_uninitialized_dependencies(
+                          name,
+                          initial_value),
+                      name=n))
+  
+  def value(self):
+    return self._read_variable_op()
+    
+  def _read_variable_op(self):
+    return gen_resource_variable_ops.read_variable_op(self._handle, self._dtype)
 ```
