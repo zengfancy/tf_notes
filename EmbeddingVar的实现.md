@@ -205,3 +205,6 @@ public:
 * 修改embedding_lookup函数，复用其中的逻辑
 
 ## 梯度更新相关
+
+* 添加一个名叫 KvResourceVariableProcessor 的 _OptimizerVariable
+* 给 Optimizer 添加两个函数 _kv_resource_apply_sparse_duplicate_indices 与 _resource_apply_sparse，默认不实现，由子类来实现
