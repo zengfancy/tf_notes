@@ -1,8 +1,9 @@
 
 ## OpKernel 的实现
 
-* EmbeddingVariable的OpKernel实现ResourceVariable 的 OpKernel实现
-* LookupableEmbeddingVar 的定义
+* Tensorflow 对变量的实现有两种方式，Variable和ResourceVariable, 其中ResourceVariable更加安全，也是TF2.0之后的默认使用方式
+* 基于以上原因，EmbeddingVariable 的 OpKernel 实现完全参考了 ResourceVariable 的 OpKernel实现
+* 以下为虚基类 LookupableEmbeddingVar 的定义
 
 ```cpp
 class LookupableEmbeddingVar {
@@ -13,9 +14,15 @@ public:
   
   int64_t emb_len_;
 };
-
+```
+* 有三种实现方式，各有优缺点
+  + 内部结构采用std::unordered_map
+  + 内部结构采用经典的2数组 HashSlot 方式
+  + 内部结构采用非经典的4数组 ArrayHashMap 方式
+  
+```cpp
 // 直接用unordered map
-// 缺点：内存散乱，访问性能差
+// 缺点：Tensor过多，内存分布比较散乱，内存cache性能差
 class HashEmbeddingVar : public LookupableEmbeddingVar {
 public:
   virtual void GetEmbedding(T key, float** data) = 0;
@@ -24,10 +31,11 @@ private:
   std::unordered_map<T, Tensor> tensor_map_;
 };
 
-// 用经典的hash方法，数组的方式实现
-// 给定一个key, hash到一个slot中去，在当前slot中查找key，如果查中则返回，如果查不中，则slot + 1，依次循环，直到遇到empty_key为止
-// hash数组的 capacity 是动态增长的，一般来说 capacity 应该为 2^n - 1, 当 capacity < length * factor 时，capacity应该倍增
-// 但是这种结构的 value 数组的长度必须跟 keys 数组的长度一致，有浪费空间之嫌
+// 1. 用经典的hash方法，数组的方式实现，两个数组，一个key数组，一个value数组
+// 2. 给定一个key, hash到一个slot中去，在当前slot中查找key，如果查中则返回，如果查不中，则slot += 1，依次循环，直到遇到empty_key为止
+// 3. hash数组的 capacity 是动态增长的，一般来说 capacity 应该为 2^n - 1, 当 capacity < length * factor （比如factor = 0.3) 时，
+//    capacity应该倍增
+// 4. 这种结构的 value 数组的长度必须跟 keys 数组的长度一致，有浪费空间之嫌
 class DenseEmbeddingVar : public LookupableEmbeddingVar {
 public:
   virtual void GetEmbedding(T key, float** data);
@@ -37,7 +45,9 @@ private:
   PersistentTensor values_;
 };
 
-// 优势：内存使用效率高，访问速度也很快
+// 1. ArrayHashMap，使用4个数组，借鉴了C#里面的Dictionary实现，详细原理可见我上次分享的PPT
+// 2. 优势：内存使用效率高，访问速度也很快，value和key长度的真实长度就是它的实际长度，所以节省内存
+// 3. first_keys_ 长度应该动态增长，当增长（一般为倍增）时，next_ 数组需要重新初始化
 class DenseEmbeddingVar2 : public LookupableEmbeddingVar {
 public:
   virtual void GetEmbedding(T key, float** data);
