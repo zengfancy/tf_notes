@@ -62,6 +62,8 @@ private:
 ```
 * EmbeddingVarHandleOp
   + 类似于VarHandleOp, 输出一个handle
+* EmbeddingInitOp
+  + 创建一个EmbeddingVariable, 类似于AssignVariableOp
   
 * EmbeddingLookupOp & EmbeddingUpdateOp 的单机实现
 
