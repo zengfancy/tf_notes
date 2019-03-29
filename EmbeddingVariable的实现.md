@@ -60,7 +60,9 @@ private:
 };
 
 ```
-
+* EmbeddingVarHandleOp
+  + 类似于VarHandleOp, 输出一个handle
+  
 * EmbeddingLookupOp & EmbeddingUpdateOp 的单机实现
 
 ```cpp
@@ -226,3 +228,7 @@ public:
 
 ## tensorflow serving相关
 * 前期可仿照 ConstantOp 实现一个 ContantEmbeddingOp, 将key, value存储到 proto 当中，后期如果占内存太大，超过4G不允许，可考虑将 key, value 保存到一个单独的文件中，ConstantOp 在初始化的时候从文件中初始化
+
+# EmbeddingVariable 梯度更新跟 RingAllReduce 框架如何结合
+  + 随机初始化不一致的问题
+  + 梯度 reduce 的问题
