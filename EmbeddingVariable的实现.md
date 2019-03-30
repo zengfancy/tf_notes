@@ -219,14 +219,14 @@ public:
   
 * 修改embedding_lookup函数，复用其中的逻辑
 
-* 导入导出相关
+## 导入导出相关
   + Variable, ResourceVariable 的导入导出可以参考 https://github.com/zengfancy/tf_notes/blob/master/save_and_restore.md
   + 仿照ResourceVariableSaveable的做法，实现一个EmbeddingVariableSaveable的类即可
 
 ## 梯度更新相关
 * 有关 Variable, ResourceVariable 的梯度更新可以参考 https://github.com/zengfancy/tf_notes/blob/master/Variable_vs_Resourcevariable.md
 * 添加一个名叫 KvResourceVariableProcessor 的 _OptimizerVariable
-* 给 Optimizer 基类添加两个函数 _kv_resource_apply_sparse_duplicate_indices 与 _resource_apply_sparse，默认不实现，由子类来实现
+* 给 Optimizer 基类添加两个函数 _kv_resource_apply_sparse_duplicate_indices 与 _kv_resource_apply_sparse，默认不实现，由子类来实现
 
 ## tensorflow serving相关
 * 前期可仿照 ConstantOp 实现一个 ContantEmbeddingOp, ContantEmbeddingOp 的 lookup 逻辑跟EmbeddingLookupOp类似，不需要有 Update 的功能。save的时候将key, value存储到 proto 当中，后期如果占内存太大，超过4G不允许，可考虑将 key, value 保存到一个单独的文件中，ConstantOp 在初始化的时候从文件中初始化
