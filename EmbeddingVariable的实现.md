@@ -259,7 +259,12 @@ class EmbeddingVariableSaveable(saveable_object.SaveableObject):
 def __init__(self, var, slice_spec, name):
   def _read_emb_variable(v):
     def f():
-      return gen_kv_embedding_ops.export_embedding(var.handle)
+      with ops.device(v.device):
+        key, value = gen_kv_embedding_ops.export_embedding(v.handle)
+        # To allow variables placed on non-CPU devices to be checkpointed,
+        # we copy them to CPU on the same machine first.
+        with ops.device("/device:CPU:0"):
+          return array_ops.identity(key), array_ops.identity(value)
     return f
   key_tensor, val_tensor = _read_emb_variable(var)
   spec_key = saveable_object.SaveSpec(key_tensor, slice_spec, name + "_key",
