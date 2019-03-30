@@ -113,6 +113,9 @@ public:
     }
   }
 };
+REGISTER_KERNEL_BUILDER("EmbeddingScatterAdd")...EmbeddingUpdateOp<Add>...
+REGISTER_KERNEL_BUILDER("EmbeddingScatterAssign")...EmbeddingUpdateOp<Assign>...
+REGISTER_KERNEL_BUILDER("EmbeddingScatterSub")...EmbeddingUpdateOp<Sub>...
 ```
 
 * EmbeddingLookup & EmbeddingUpdate 的分布式PS实现
@@ -122,9 +125,6 @@ public:
   + EmbeddingGradReduceOp : 将 key 去重，并 reduce grad value, Tensorflow似乎已经有实现
   + EmbeddingUpdateOp : 和单机版的 EmbeddingUpdateOp 一样
   
-  
-
-
 ```cpp
          ^                                                               ^   
          |  val_tensor    ----------------------------                   |  val_tensor_2
