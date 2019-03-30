@@ -121,6 +121,8 @@ public:
   + EmbeddingLookUpOp : 和单机版的 EmbeddingLookUpOp 一样
   + EmbeddingGradReduceOp : 将 key 去重，并 reduce grad value, Tensorflow似乎已经有实现
   + EmbeddingUpdateOp : 和单机版的 EmbeddingUpdateOp 一样
+  
+  
 
 
 ```cpp
@@ -200,13 +202,28 @@ public:
 
 ## Ops 的实现
 
-* EmbeddingLookup ：查找，输入key，返回value
-* EmbeddingScatterAdd/Sub/Assign ：更新, 输入key, grad，无返回, 这个Op用于SGD算法的梯度更新，Adam, AdaGrad等复杂更新算法需要额外的Op才能完成
-* EmbeddingKeyDedup ：key去重，输入key, 返回去重后的key
-* EmbeddingDuplicate ：key, value反去重，输入key1, key2, value, 返回duplicate之后的value
-* EmbeddingGradReduce ：key去重，并将grad合并,输入key, grad,返回合并后的key, grad
-* ExportEmbedding ：导出
-* ImportEmbedding ：导入
+* 定义如下Ops:
+  + EmbeddingLookup ：查找，输入key，返回value
+  + EmbeddingScatterAdd/Sub/Assign ：更新, 输入key, grad，无返回, 这个Op用于SGD算法的梯度更新，Adam, AdaGrad等复杂更新算法需要额外的Op才能完成
+  + EmbeddingKeyDedup ：key去重，输入key, 返回去重后的key
+  + EmbeddingDuplicate ：key, value反去重，输入key1, key2, value, 返回duplicate之后的value
+  + EmbeddingGradReduce ：key去重，并将grad合并,输入key, grad,返回合并后的key, grad
+  + ExportEmbedding ：导出
+  + ImportEmbedding ：导入
+
+* 会产生一个python 文件 gen_kv_embedding_ops.py
+
+```python
+def embedding_lookup:
+def embedding_scatter_add:
+def embedding_scatter_sub:
+def embedding_scatter_assign:
+def embedding_key_dedup:
+def embedding_duplicate:
+def embedding_grad_reduce:
+def export_embedding:
+def import_embedding:
+```
 
 ## Python 层的实现
 * 有关 Variable, ResourceVariable 的实现可以参考 https://github.com/zengfancy/tf_notes/blob/master/Variable_vs_Resourcevariable.md
