@@ -226,12 +226,12 @@ public:
 ## 梯度更新相关
 * 有关 Variable, ResourceVariable 的梯度更新可以参考 https://github.com/zengfancy/tf_notes/blob/master/Variable_vs_Resourcevariable.md
 * 添加一个名叫 KvResourceVariableProcessor 的 _OptimizerVariable
-* 给 Optimizer 添加两个函数 _kv_resource_apply_sparse_duplicate_indices 与 _resource_apply_sparse，默认不实现，由子类来实现
+* 给 Optimizer 基类添加两个函数 _kv_resource_apply_sparse_duplicate_indices 与 _resource_apply_sparse，默认不实现，由子类来实现
 
 ## tensorflow serving相关
-* 前期可仿照 ConstantOp 实现一个 ContantEmbeddingOp, 将key, value存储到 proto 当中，后期如果占内存太大，超过4G不允许，可考虑将 key, value 保存到一个单独的文件中，ConstantOp 在初始化的时候从文件中初始化
+* 前期可仿照 ConstantOp 实现一个 ContantEmbeddingOp, ContantEmbeddingOp 的 lookup 逻辑跟EmbeddingLookupOp类似，不需要有 Update 的功能。save的时候将key, value存储到 proto 当中，后期如果占内存太大，超过4G不允许，可考虑将 key, value 保存到一个单独的文件中，ConstantOp 在初始化的时候从文件中初始化
 
-# EmbeddingVariable 梯度更新跟 RingAllReduce 框架如何结合
+## EmbeddingVariable 梯度更新跟 RingAllReduce 框架如何结合
 * Embedding特征随机初始化不一致的问题 ：修改随机初始化的规则，使得初始化不随机，比如：根据特征key的值，算出一个固定的hash值，再根据hash值确定初始化值，注意数学分布符合高斯分布即可
 * 梯度 reduce 的问题 ：应该修改一下 Hovorod 的优化器就可以，使用hovorod训练代码示例如下
   + hvd.DistributedOptimizer 的作用是包装了adam optimizer, 并将分布式梯度 gather, reduce，需要修改 DistributedOptimizer 以适应 EmbeddingVariable
