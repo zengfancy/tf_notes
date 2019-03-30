@@ -204,7 +204,7 @@ public:
 
 * 定义如下Ops:
   + EmbeddingVarHandleOp : 
-  + EmbeddingLookup ：查找，输入key，返回value
+  + EmbeddingGather ：查找，输入key，返回value
   + EmbeddingScatterAdd/Sub/Assign ：更新, 输入key, grad，无返回, 这个Op用于SGD算法的梯度更新，Adam, AdaGrad等复杂更新算法需要额外的Op才能完成
   + EmbeddingKeyDedup ：key去重，输入key, 返回去重后的key
   + EmbeddingDuplicate ：key, value反去重，输入key1, key2, value, 返回duplicate之后的value
@@ -217,7 +217,7 @@ public:
 ```python
 def embedding_var_handle_op:
 def init_embedding_var:
-def embedding_lookup:
+def embedding_gather:
 def embedding_scatter_add:
 def embedding_scatter_sub:
 def embedding_scatter_assign:
@@ -247,11 +247,21 @@ class EmbeddingVariable(VariableV1):
   
 * 修改variable_scope.py，支持从get_variable()函数得到一个EmbeddingVariable
   
-* 修改embedding_lookup函数，复用其中的逻辑
+* Tensorflow 里面 embedding_lookup 函数调用了 array_ops.gather 函数，需要修改 gather 这个函数，普通的 Variable 调用 gen_array_ops.gather_v2，EmbeddingVariable 应该调用 embedding_gather
 
 ## 导入导出相关
-  + Variable, ResourceVariable 的导入导出可以参考 https://github.com/zengfancy/tf_notes/blob/master/save_and_restore.md
-  + 仿照ResourceVariableSaveable的做法，实现一个EmbeddingVariableSaveable的类即可
+* Variable, ResourceVariable 的导入导出可以参考 https://github.com/zengfancy/tf_notes/blob/master/save_and_restore.md
+* 仿照ResourceVariableSaveable的做法，实现一个EmbeddingVariableSaveable的类即可
+  
+```python
+class EmbeddingVariableSaveable(saveable_object.SaveableObject):
+# 实现 save 逻辑
+def __init__:
+
+# 实现 restore 逻辑
+def restore():
+
+```
 
 ## 梯度更新相关
 * 有关 Variable, ResourceVariable 的梯度更新可以参考 https://github.com/zengfancy/tf_notes/blob/master/Variable_vs_Resourcevariable.md, 下一步
