@@ -256,10 +256,20 @@ class EmbeddingVariable(VariableV1):
 ```python
 class EmbeddingVariableSaveable(saveable_object.SaveableObject):
 # 实现 save 逻辑
-def __init__:
+def __init__(self, var, slice_spec, name):
+  def _read_emb_variable(v):
+    def f():
+      return gen_kv_embedding_ops.export_embedding(var.handle)
+    return f
+  key_tensor, val_tensor = _read_emb_variable(var)
+  spec_key = saveable_object.SaveSpec(key_tensor, slice_spec, name + "_key",
+                                    dtype=var.dtype)
+  spec_val = saveable_object.SaveSpec(tensor, slice_spec, name + "_value",
+                                    dtype=var.dtype)                                  
+  super(EmbeddingVariableSaveable, self).__init__(var, [spec_key, spec_value], name)
 
 # 实现 restore 逻辑
-def restore():
+def restore(self, restored_tensors, restored_shapes):
 
 ```
 
