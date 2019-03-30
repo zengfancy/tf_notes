@@ -201,7 +201,7 @@ public:
 ## Ops 的实现
 
 * EmbeddingLookup ：查找，输入key，返回value
-* EmbeddingUpdate ：更新, 输入key, grad，无返回, 这个Op用于SGD算法的梯度更新，Adam, AdaGrad等复杂更新算法需要额外的Op才能完成
+* EmbeddingScatterAdd/Sub/Assign ：更新, 输入key, grad，无返回, 这个Op用于SGD算法的梯度更新，Adam, AdaGrad等复杂更新算法需要额外的Op才能完成
 * EmbeddingKeyDedup ：key去重，输入key, 返回去重后的key
 * EmbeddingDuplicate ：key, value反去重，输入key1, key2, value, 返回duplicate之后的value
 * EmbeddingGradReduce ：key去重，并将grad合并,输入key, grad,返回合并后的key, grad
@@ -237,7 +237,22 @@ class _DenseResourceVariableProcessor(_OptimizableVariable):
 ```
 
 * 添加一个名叫 KvResourceVariableProcessor 的 _OptimizerVariable
-* 给 Optimizer 基类添加两个函数 _kv_resource_apply_sparse_duplicate_indices 与 _kv_resource_apply_sparse，默认不实现，由子类来实现
+```python
+class _KvResourceVariableProcessor(_OptimizableVariable):
+  def update_op(self, optimizer, g):
+    if not isinstance(g, ops.IndexedSlices):
+      raise NotSupportError("")
+      
+    return optimizer._kv_resource_apply_sparse_duplicate_indices(
+          g.values, self._v, g.indices)
+```
+
+* 给 Optimizer 基类添加两个函数 _kv_resource_apply_sparse_duplicate_indices 与 _kv_resource_apply_sparse，默认不实现，由子类来实现，以sgd为例
+```python
+class GradientDescentOptimizer(optimizer.Optimizer):
+  def _resource_apply_sparse_duplicate_indices(self, grad, handle, indices):
+    return kv_resource_variable_ops.embedding_scatter_add(handle, indices, grad）
+```
 
 ## tensorflow serving相关
 * 前期可仿照 ConstantOp 实现一个 ContantEmbeddingOp, ContantEmbeddingOp 的 lookup 逻辑跟EmbeddingLookupOp类似，不需要有 Update 的功能。save的时候将key, value存储到 proto 当中，后期如果占内存太大，超过4G不允许，可考虑将 key, value 保存到一个单独的文件中，ConstantOp 在初始化的时候从文件中初始化
