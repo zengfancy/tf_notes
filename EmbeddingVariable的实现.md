@@ -224,7 +224,18 @@ public:
   + 仿照ResourceVariableSaveable的做法，实现一个EmbeddingVariableSaveable的类即可
 
 ## 梯度更新相关
-* 有关 Variable, ResourceVariable 的梯度更新可以参考 https://github.com/zengfancy/tf_notes/blob/master/Variable_vs_Resourcevariable.md
+* 有关 Variable, ResourceVariable 的梯度更新可以参考 https://github.com/zengfancy/tf_notes/blob/master/Variable_vs_Resourcevariable.md, 下一步
+
+```python
+class _DenseResourceVariableProcessor(_OptimizableVariable):
+  def update_op(self, optimizer, g):
+    if isinstance(g, ops.IndexedSlices):
+      return optimizer._resource_apply_sparse_duplicate_indices(
+          g.values, self._v, g.indices)
+    else:
+      return optimizer._resource_apply_dense(g, self._v)
+```
+
 * 添加一个名叫 KvResourceVariableProcessor 的 _OptimizerVariable
 * 给 Optimizer 基类添加两个函数 _kv_resource_apply_sparse_duplicate_indices 与 _kv_resource_apply_sparse，默认不实现，由子类来实现
 
