@@ -232,5 +232,48 @@ public:
 * 前期可仿照 ConstantOp 实现一个 ContantEmbeddingOp, 将key, value存储到 proto 当中，后期如果占内存太大，超过4G不允许，可考虑将 key, value 保存到一个单独的文件中，ConstantOp 在初始化的时候从文件中初始化
 
 # EmbeddingVariable 梯度更新跟 RingAllReduce 框架如何结合
-  + 随机初始化不一致的问题
-  + 梯度 reduce 的问题
+* Embedding特征随机初始化不一致的问题 ：修改随机初始化的规则，使得初始化不随机，比如：根据特征key的值，算出一个固定的hash值，再根据hash值确定初始化值，注意数学分布符合高斯分布即可
+* 梯度 reduce 的问题 ：应该修改一下 Hovorod 的优化器就可以，使用hovorod训练代码示例如下
+  + hvd.DistributedOptimizer 的作用是包装了adam optimizer, 并将分布式梯度 gather, reduce，需要修改 DistributedOptimizer 以适应 EmbeddingVariable
+  + BroadcastGlobalVariablesHook 的作用是随机初始化 variable 的时候保持每个机器上的初始化值一致，EmbeddingVariable 初始化的时候是空的，所以应该不需要关心
+  
+```python
+import tensorflow as tf
+import horovod.tensorflow as hvd
+
+# 1、初始化 Horovod
+hvd.init()
+
+# 2、使用GPU来处理本地队列（向每个TensorFlow进分配一个进程）
+config = tf.ConfigProto()
+config.gpu_options.visible_device_list = str(hvd.local_rank())
+
+# 3、建立模型
+loss = ...
+opt = tf.train.AdagradOptimizer(0.01 * hvd.size())
+
+# 4、添加Horovod分布式优化器
+opt = hvd.DistributedOptimizer(opt)
+
+# 5、Add hook to broadcast variables from rank 0 to all other processes during
+# initialization.
+hooks = [hvd.BroadcastGlobalVariablesHook(0)]
+
+# Make training operation
+train_op = opt.minimize(loss)
+
+# Save checkpoints only on worker 0 to prevent other workers from corrupting them.
+checkpoint_dir = '/tmp/train_logs' if hvd.rank() == 0 else None
+
+# The MonitoredTrainingSession takes care of session initialization,
+# restoring from a checkpoint, saving to a checkpoint, and closing when done
+# or an error occurs.
+with tf.train.MonitoredTrainingSession(checkpoint_dir=checkpoint_dir,
+                                       config=config,
+                                       hooks=hooks) as mon_sess:
+  while not mon_sess.should_stop():
+    # Perform synchronous training.
+    mon_sess.run(train_op)
+
+```
+  
