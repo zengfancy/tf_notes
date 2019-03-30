@@ -203,6 +203,7 @@ public:
 ## Ops 的实现
 
 * 定义如下Ops:
+  + EmbeddingVarHandleOp : 
   + EmbeddingLookup ：查找，输入key，返回value
   + EmbeddingScatterAdd/Sub/Assign ：更新, 输入key, grad，无返回, 这个Op用于SGD算法的梯度更新，Adam, AdaGrad等复杂更新算法需要额外的Op才能完成
   + EmbeddingKeyDedup ：key去重，输入key, 返回去重后的key
@@ -214,6 +215,8 @@ public:
 * 会产生一个python 文件 gen_kv_embedding_ops.py
 
 ```python
+def embedding_var_handle_op:
+def init_embedding_var:
 def embedding_lookup:
 def embedding_scatter_add:
 def embedding_scatter_sub:
@@ -227,10 +230,20 @@ def import_embedding:
 
 ## Python 层的实现
 * 有关 Variable, ResourceVariable 的实现可以参考 https://github.com/zengfancy/tf_notes/blob/master/Variable_vs_Resourcevariable.md
-* EmbeddingVariable
-  + 从ResourceVariable继承
+* EmbeddingVariable, 参考ResourceVariable实现
+  + 继承自VariableV1
   + 实现其init_from_proto, init_from_args
-  + 其他逻辑如 read_value, read, sparse_read 参考 ResourceVariable的实现
+  + lookup 逻辑如 sparse_read
+  
+```python
+class EmbeddingVariable(VariableV1):
+  def __init__:
+    self._handle = gen_kv_embedding_ops.embedding_var_hanle_op()
+    self._init_op = gen_kv_embedding_ops.init_embedding_var(self._handle, emb_shape)
+    
+  def sparse_read(indices):
+    return gen_kv_embedding_ops.embedding_lookup(self._handle, indices)
+```
   
 * 修改variable_scope.py，支持从get_variable()函数得到一个EmbeddingVariable
   
