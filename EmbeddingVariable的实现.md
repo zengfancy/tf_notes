@@ -1,3 +1,4 @@
+# 开发技术点梳理
 
 ## OpKernel 的实现
 
@@ -358,3 +359,20 @@ with tf.train.MonitoredTrainingSession(checkpoint_dir=checkpoint_dir,
 
 ```
   
+
+
+# 项目排期规划
+* 各个模块相互调用关系梳理，详细的接口设计，需要1个星期
+* 代码开发，单元测试：总共21天，总共一个月，开发任务可以2个人并行实现，满打满算大概半个月，加上需要处理其他方面的事情，3个星期左右
+  + EmbeddingVariale HashMap结构体实现：3天
+  + opkernel 层实现：3天
+  + ops 实现：1天
+  + python 层 ：
+    - EmbeddingVariable 层包装：2天
+    - 导入导出相关：1天
+  + 梯度更新相关，包括实现Adam Optimizer的更新：3天
+  + RingAllReduce相关改造：3天
+  + tensorflow serving相关：3天
+
+* 联调测试：大概2个星期
+* overall，很顺利的话需要1个半月左右的时间，generally 2个月之内可以交付使用
