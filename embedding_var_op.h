@@ -13,9 +13,9 @@ public:
 
     TensorShape outShape = key.shape();
     outShape.AppendShape(var->GetValueShape());
-
-    status = context->allocate_output(0, outShape, &value);
+	  
     Tensor* value = nullptr;
+    status = context->allocate_output(0, outShape, &value);
 
     const auto emb_len = var->GetEmbLen();
     const auto key_vec = key.shaped<K, 1>({num_elems});
@@ -86,28 +86,39 @@ public:
 class EmbeddingKeyDedupOp : public OpKernel {
 public:
   void Compute(OpKernelContext* context) {
+  }
 };
 
 // check一下是否tensorflow已经实现了这个算子	
 class EmbeddingKeyDuplicateOp : public OpKernel {
-	
+  void Compute(OpKernelContext* context) {
+  }
 };
 
 // check一下是否tensorflow已经实现了这个算子	
 class EmbeddingGradReduceOp : public OpKernel {
+  void Compute(OpKernelContext* context) {
+  }
 };
 
 
 class ImportEmbeddingOp : public OpKernel {
 public:
   void Compute(OpKernelContext* context) {
+    const ResourceHandle& handle = HandleFromInput(context, 0);
+    const Tensor& key = context->input(1);
+    const Tensor& emb_value = context->input(2);
   }
 };
 
 class ExportEmbeddingOp : public OpKernel {
 public:
   void Compute(OpKernelContext* context) {
-    
+    const ResourceHandle& handle = HandleFromInput(context, 0);
+    Tensor* key = nullptr;
+    Tensor* emb_value = nullptr;
+    status = context->allocate_output(0, shape, &key);
+    status = context->allocate_output(1, shape, &emb_value);
   }
 };
 	
