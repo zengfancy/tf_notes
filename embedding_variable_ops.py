@@ -55,7 +55,8 @@ class EmbeddingVariable(variables.VariableV1):
     self._key_type = ops.convert_to_tensor(invalid_key,
            name="invalid_key", preferred_dtype=dtypes.int64).dtype.base_dtype
 
-    self._handle = self._embedding_variable_handle(
+    with ops.name_scope("") as name:
+      self._handle = self._embedding_variable_handle(
             shape=initial_value.get_shape(),
             dtype=initial_value.dtype.base_dtype,
             ktype=self._key_type,
@@ -101,5 +102,6 @@ class EmbeddingVariable(variables.VariableV1):
     This function is like ResourceVariable.sparse_read.
     See also array_ops.gather. 
     """
-    return gen_embedding_var_ops.embedding_lookup_op(self._handle, indices, name=name)
+    with ops.name_scope("") as name:
+      return gen_embedding_var_ops.embedding_lookup_op(self._handle, indices, name=name)
 
