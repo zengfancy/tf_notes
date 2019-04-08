@@ -81,6 +81,37 @@ public:
   }
 };
 
+	
+// check一下是否tensorflow已经实现了这个算子	
+class EmbeddingKeyDedupOp : public OpKernel {
+public:
+  void Compute(OpKernelContext* context) {
+};
+
+// check一下是否tensorflow已经实现了这个算子	
+class EmbeddingKeyDuplicateOp : public OpKernel {
+	
+};
+
+// check一下是否tensorflow已经实现了这个算子	
+class EmbeddingGradReduceOp : public OpKernel {
+};
+
+
+class ImportEmbeddingOp : public OpKernel {
+public:
+  void Compute(OpKernelContext* context) {
+  }
+};
+
+class ExportEmbeddingOp : public OpKernel {
+public:
+  void Compute(OpKernelContext* context) {
+    
+  }
+};
+	
+	
 #define REGISTER_KERNELS(K, V) \
   REGISTER_KERNEL_BUILDER(Name("InitializeEmbeddingOp") \
       .Device(DEVICE_CPU)  \
@@ -94,4 +125,4 @@ public:
   REGISTER_KERNELS(string, V)
 
 
-TF_CALL_ALL_TYPES(REGISTER_KERNELS_K)
+TF_CALL_ALL_TYPES(REGISTER_KERNELS_K);
