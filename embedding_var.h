@@ -15,6 +15,12 @@ private:
   std::unordered_map<K, PersistentTensor> tensor_map_;
 };
 
+/*
+start array : -1   1  3  0  -1  -1  5   7  -1  -1
+key   array :  3  21  13 42 53  76  43  97 86
+value array :  v   v  v  v   v   v  v   v   v
+next  array :  2  -1  4  -1  6   8  -1  -1  -1
+*/
 template <typename K, typename V>
 class DenseEmbeddingVar2 : public EmbeddingVar<K, V> {
 public:
