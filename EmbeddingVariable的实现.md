@@ -248,7 +248,21 @@ class EmbeddingVariable(VariableV1):
   
 * 修改variable_scope.py，支持从get_variable()函数得到一个EmbeddingVariable
   
-* Tensorflow 里面 embedding_lookup 函数调用了 array_ops.gather 函数，需要修改 gather 这个函数，普通的 Variable 调用 gen_array_ops.gather_v2，EmbeddingVariable 应该调用 embedding_gather
+* Tensorflow 里面 embedding_lookup 函数调用了 array_ops.gather 函数, gather 函数会调用sparse_read，EmbeddingVariable 跟 ResourceVariable一样，只需要实现sparse_read()函数即可
+  + 如果考虑到分布式环境下需要去重的需求，应该修改embedding_lookup的实现
+  
+```python
+# not unique
+with ops.colocate_with(params):
+  result = array_ops.gather(params, ids)
+```
+```python
+# unique
+ids, idx = array_ops.unique(ids)
+with ops.colocate_with(params):
+  temp_result = array_ops.gather(params, ids)
+result = array_ops.gather(temp_result, idx)
+```
 
 ## 导入导出相关
 * Variable, ResourceVariable 的导入导出可以参考 https://github.com/zengfancy/tf_notes/blob/master/save_and_restore.md
