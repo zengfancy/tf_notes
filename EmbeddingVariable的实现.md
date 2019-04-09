@@ -294,7 +294,7 @@ def restore(self, restored_tensors, restored_shapes):
 ```
 
 ## 梯度更新相关
-* 有关 Variable, ResourceVariable 的梯度更新可以参考 https://github.com/zengfancy/tf_notes/blob/master/Variable_vs_Resourcevariable.md, 下一步
+* 有关 Variable, ResourceVariable 的梯度更新可以参考 https://github.com/zengfancy/tf_notes/blob/master/Variable_vs_Resourcevariable.md, 以   ResourceVariable 对应的 optimizer 处理逻辑为例
 
 ```python
 class _DenseResourceVariableProcessor(_OptimizableVariable):
@@ -320,7 +320,7 @@ class _KvResourceVariableProcessor(_OptimizableVariable):
 * 给 Optimizer 基类添加两个函数 _kv_resource_apply_sparse_duplicate_indices 与 _kv_resource_apply_sparse，默认不实现，由子类来实现，以sgd为例
 ```python
 class GradientDescentOptimizer(optimizer.Optimizer):
-  def _resource_apply_sparse_duplicate_indices(self, grad, handle, indices):
+  def _kv_resource_apply_sparse_duplicate_indices(self, grad, handle, indices):
     return kv_resource_variable_ops.embedding_scatter_add(handle, indices, grad）
 ```
 
