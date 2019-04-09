@@ -15,6 +15,11 @@ private:
   std::unordered_map<K, PersistentTensor> tensor_map_;
 };
 
+/* 
+  hash bucket function : hash(key) % 10
+  take key = "fanxi" as example. if hash("fanxi") = 4098, then the bucket is 4098 % 10 = 8.
+*/
+
 /*
 start array : -1   1  3  0  -1  -1  5   7  -1  -1
 key   array :  3  21  13 42 53  76  43  97 86
@@ -23,10 +28,10 @@ next  array :  2  -1  4  -1  6   8  -1  -1  -1
 */
 
 /*
--1 -1 -1 0 -1 -1 -1 -1 -1  1
-3   9
-v   v
--1 -1
+start array : -1 -1 -1 0 -1 -1 -1 -1 -1  1
+key   array : 3   9
+value array : v   v
+next  array : -1 -1
 */
 template <typename K, typename V>
 class DenseEmbeddingVar2 : public EmbeddingVar<K, V> {
