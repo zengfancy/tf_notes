@@ -91,4 +91,7 @@ private:
   float factor_;    // valued 2.0, for example
 };
 
+template <typename K, typename V>
+EmbeddingVar<K, V>* NewEmbeddingVar() {
+}
 
