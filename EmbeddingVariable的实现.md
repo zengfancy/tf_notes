@@ -120,8 +120,8 @@ REGISTER_KERNEL_BUILDER("EmbeddingScatterSub")...EmbeddingUpdateOp<Sub>...
 ```
 
 * EmbeddingLookup & EmbeddingUpdate 的分布式PS实现
-  + EmbeddingKeyDedupOp : 将 key 去重, Tensorflow似乎已经有实现
-  + EmbeddingDuplicateOp : 反去重, Tensorflow似乎已经有实现
+  + EmbeddingKeyDedupOp : 将 key 去重, array_ops.unique()已经实现了该功能，无须重复实现
+  + EmbeddingDuplicateOp : 反去重, array_ops.gather()已经实现了该功能，无须重复实现
   + EmbeddingLookUpOp : 和单机版的 EmbeddingLookUpOp 一样
   + EmbeddingGradReduceOp : 将 key 去重，并 reduce grad value, Tensorflow似乎已经有实现
   + EmbeddingUpdateOp : 和单机版的 EmbeddingUpdateOp 一样
@@ -131,13 +131,13 @@ REGISTER_KERNEL_BUILDER("EmbeddingScatterSub")...EmbeddingUpdateOp<Sub>...
          |  val_tensor    ----------------------------                   |  val_tensor_2
          |                                            |                  |
     EmbeddingLookUpOp                                 --------> EmbeddingDuplicateOp
-         ^                                                           ^      ^
-         |                                                           |      |
-         |  key_tensor_   --------------------------------------------      |
-         |                                                                  |
-   EmbeddingKeyDedupOp                                                      |
-         ^                                                                  |
-         |  key_tensor   ----------------------------------------------------
+         ^                                                                 ^
+         |                                                                 |
+         |  key_tensor_                                                    |
+         |                                                                 |
+   EmbeddingKeyDedupOp   ------------------------------------------------- |  
+         ^                                                                
+         |  key_tensor 
          |
    
 // no output for update
