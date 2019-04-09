@@ -3,9 +3,11 @@ template <typename K, typename V>
 class EmbeddingVar : public ResourceBase {
 public:
   virtual void GetEmbedding(K key, V** data) = 0;
-  virtual void PutEmbedding(K key, V* data, scatter_op::UpdateOp op) = 0;
+  virtual void PutEmbedding(K key, const V* data, int64 len, scatter_op::UpdateOp op) = 0;
+  virtual void DeleteKey(K key) = 0;
   
-  TensorShape GetValueShape();
+  TensorShape GetEmbShape();
+  int64 GetEmbLen();
 };
 
 template <typename K, typename V>
@@ -16,8 +18,14 @@ private:
 };
 
 /* 
-  hash bucket function : hash(key) % 10
+  hash bucket function : hash(key) % buckets(take buckets as 10, for example)
   take key = "fanxi" as example. if hash("fanxi") = 4098, then the bucket is 4098 % 10 = 8.
+*/
+
+/* 1. the length of start array is as long as the all hash buckets.
+   2. the length of key, value, next array is the same. 
+   3. factor_ : when keys'num > buckets_ * facotr_ * 1.1, the array should Grow()
+                when keys'num < buckets_ * facotr_ * 0.9, the array should Shrink()
 */
 
 /*
@@ -38,10 +46,16 @@ class DenseEmbeddingVar2 : public EmbeddingVar<K, V> {
 public:
   
 private:
+  void Shrink();
+  void Grow();
+private:
   PersistentTensor first_keys_;
   PersistentTensor keys_;
   PersistentTensor values_;
   PersistentTensor next_;
+  
+  int64 buckets_;
+  int32 factor_;
 };
 
 
