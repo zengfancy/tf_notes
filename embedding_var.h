@@ -17,6 +17,36 @@ private:
   std::unordered_map<K, PersistentTensor> tensor_map_;
 };
 
+/*
+  It's the standard implementation of HashTable as an array.
+  
+  hash bucket function : hash(key) % buckets(take buckets as 100, for example)
+  take key = "fanxi" as example. if hash("fanxi") = 4098, then the bucket is 4098 % 100 = 98.
+  let's check whether slot(98) valued "fanxi", if not, check slot(99)...
+  if invalid_key_ found, then we say this hashmap doesn't have a key valued "fanxi"
+  
+  3. factor_ : when keys'num > buckets_ * factor_ * 1.1, the array should Grow()
+               when keys'num < buckets_ * factor_ * 0.9, the array should Shrink()
+*/
+template <typename K, typename V>
+class DenseEmbeddingVar1 : public EmbeddingVar<K, V> {
+public:
+  virtual void GetEmbedding(K key, V** data);
+  virtual void PutEmbedding(K key, const V* data, int64 len, scatter_op::UpdateOp op);
+  virtual void DeleteKey(K key);
+  
+private:
+  void Shrink();
+  void Grow();
+  
+  PersistentTensor keys_;
+  PersistentTensor values_;
+  
+  float factor_; // valued 0.3, for example
+  int64 buckets_; // usually valued 2^n
+  K invalid_key_;
+};
+
 /* 
   hash bucket function : hash(key) % buckets(take buckets as 10, for example)
   take key = "fanxi" as example. if hash("fanxi") = 4098, then the bucket is 4098 % 10 = 8.
@@ -24,8 +54,8 @@ private:
 
 /* 1. the length of start array is as long as the all hash buckets.
    2. the length of key, value, next array is the same. 
-   3. factor_ : when keys'num > buckets_ * facotr_ * 1.1, the array should Grow()
-                when keys'num < buckets_ * facotr_ * 0.9, the array should Shrink()
+   3. factor_ : when keys'num > buckets_ * factor_ * 1.1, the array should Grow()
+                when keys'num < buckets_ * factor_ * 0.9, the array should Shrink()
 */
 
 /*
@@ -44,6 +74,9 @@ next  array : -1 -1
 template <typename K, typename V>
 class DenseEmbeddingVar2 : public EmbeddingVar<K, V> {
 public:
+  virtual void GetEmbedding(K key, V** data);
+  virtual void PutEmbedding(K key, const V* data, int64 len, scatter_op::UpdateOp op);
+  virtual void DeleteKey(K key);
   
 private:
   void Shrink();
@@ -54,8 +87,8 @@ private:
   PersistentTensor values_;
   PersistentTensor next_;
   
-  int64 buckets_;
-  int32 factor_;
+  int64 buckets_;   // usually valued 2^n
+  float factor_;    // valued 2.0, for example
 };
 
 
