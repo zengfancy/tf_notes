@@ -12,7 +12,7 @@ public:
     const int64 num_elems = key.NumElements();
 
     TensorShape outShape = key.shape();
-    outShape.AppendShape(var->GetValueShape());
+    outShape.AppendShape(var->GetEmbShape());
 	  
     Tensor* value = nullptr;
     status = context->allocate_output(0, outShape, &value);
@@ -55,9 +55,6 @@ public:
   }
 };
 
-template <typename K, typename V>
-EmbeddingVar<K, V>* NewEmbeddingVar() {
-}
 
 template <typename K, typename V>
 class InitializeEmbeddingOp : public OpKernel {
@@ -82,14 +79,14 @@ public:
 };
 
 	
-// check一下是否tensorflow已经实现了这个算子	
+// check一下是否tensorflow已经实现了这个算子, array_ops.uniqe()相当于这个功能
 class EmbeddingKeyDedupOp : public OpKernel {
 public:
   void Compute(OpKernelContext* context) {
   }
 };
 
-// check一下是否tensorflow已经实现了这个算子	
+// check一下是否tensorflow已经实现了这个算子, array_ops.gather()相当于这个功能
 class EmbeddingKeyDuplicateOp : public OpKernel {
   void Compute(OpKernelContext* context) {
   }
