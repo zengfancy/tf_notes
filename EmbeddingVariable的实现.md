@@ -123,7 +123,15 @@ REGISTER_KERNEL_BUILDER("EmbeddingScatterSub")...EmbeddingUpdateOp<Sub>...
   + EmbeddingKeyDedupOp : 将 key 去重, array_ops.unique()已经实现了该功能，无须重复实现
   + EmbeddingDuplicateOp : 反去重, array_ops.gather()已经实现了该功能，无须重复实现
   + EmbeddingLookUpOp : 和单机版的 EmbeddingLookUpOp 一样
-  + EmbeddingGradReduceOp : 将 key 去重，并 reduce grad value, Tensorflow似乎已经有实现
+  + EmbeddingGradReduceOp : 将 key 去重，并 reduce grad value, tensorflow已经实现了这个功能，详细实现方法见如下代码
+```python
+def _deduplicate_indexed_slices(values, indices):
+  unique_indices, new_index_positions = array_ops.unique(indices)
+  summed_values = math_ops.unsorted_segment_sum(
+      values, new_index_positions,
+      array_ops.shape(unique_indices)[0])
+  return (summed_values, unique_indices)
+```
   + EmbeddingUpdateOp : 和单机版的 EmbeddingUpdateOp 一样
   
 ```cpp
