@@ -2,6 +2,8 @@
 template <typename K, typename V>
 class EmbeddingVar : public ResourceBase {
 public:
+  EmbeddingVar(TensorShape shape);
+  
   virtual void GetEmbedding(K key, V** data) = 0;
   virtual void PutEmbedding(K key, const V* data, int64 len, scatter_op::UpdateOp op) = 0;
   virtual void DeleteKey(K key) = 0;
@@ -9,6 +11,9 @@ public:
   
   TensorShape GetEmbShape();
   int64 GetEmbLen();
+  
+protected:
+  TensorShape emb_shape_;
 };
 
 template <typename K, typename V>
@@ -80,7 +85,9 @@ public:
   virtual void PutEmbedding(K key, const V* data, int64 len, scatter_op::UpdateOp op);
   virtual void DeleteKey(K key);
   virtual void Initialize(OpKernelContext* ctx) {
-    DataType dt = DataTypeToEnum<K>::v();
+    DataType key_type = DataTypeToEnum<K>::v();
+    DataType value_type = DataTypeToEnum<V>::v();
+    
     ctx->allocate_persistent(dt, shape...)
   }
   
@@ -94,6 +101,8 @@ private:
   PersistentTensor next_;
   
   int64 buckets_;   // usually valued 2^n
+  int64 len_;
+  int64 capacity_;
   float factor_;    // valued 2.0, for example
 };
 
