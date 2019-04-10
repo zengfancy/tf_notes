@@ -79,7 +79,10 @@ public:
   virtual void GetEmbedding(K key, V** data);
   virtual void PutEmbedding(K key, const V* data, int64 len, scatter_op::UpdateOp op);
   virtual void DeleteKey(K key);
-  virtual void Initialize(OpKernelContext* ctx);
+  virtual void Initialize(OpKernelContext* ctx) {
+    DataType dt = DataTypeToEnum<K>::v();
+    ctx->allocate_persistent(dt, shape...)
+  }
   
 private:
   void Shrink();
