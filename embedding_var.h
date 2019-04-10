@@ -2,7 +2,7 @@
 template <typename K, typename V>
 class EmbeddingVar : public ResourceBase {
 public:
-  EmbeddingVar(TensorShape shape);
+  EmbeddingVar((OpKernelContext* ctx, OpKernel* kernel);
   
   virtual void GetEmbedding(K key, V** data) = 0;
   virtual void PutEmbedding(K key, const V* data, int64 len, scatter_op::UpdateOp op) = 0;
