@@ -69,8 +69,9 @@ public:
       context,
       LookupOrCreateResource<EmbeddingVar<K, V>>(
         context, HandleFromInput(context, 0), &variable,
-          [](EmbeddingVar<K, V>** ptr) {
+          [context, ](EmbeddingVar<K, V>** ptr) {
 	    *ptr = NewEmbeddingVar<K, V>();
+	    (*ptr)->Initialize(context);
 	    return Status::OK();
 	  }
       )
