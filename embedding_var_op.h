@@ -79,20 +79,20 @@ public:
 };
 
 	
-// check一下是否tensorflow已经实现了这个算子, array_ops.uniqe()相当于这个功能
+// 无需再实现, array_ops.uniqe()相当于这个功能
 class EmbeddingKeyDedupOp : public OpKernel {
 public:
   void Compute(OpKernelContext* context) {
   }
 };
 
-// check一下是否tensorflow已经实现了这个算子, array_ops.gather()相当于这个功能
+// 无需再实现, array_ops.gather()相当于这个功能
 class EmbeddingKeyDuplicateOp : public OpKernel {
   void Compute(OpKernelContext* context) {
   }
 };
 
-// check一下是否tensorflow已经实现了这个算子	
+// 无需再实现, optimizer._deduplicate_indexed_slices() 实现了同等的功能
 class EmbeddingGradReduceOp : public OpKernel {
   void Compute(OpKernelContext* context) {
   }
