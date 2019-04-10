@@ -271,6 +271,7 @@ with ops.colocate_with(params):
   temp_result = array_ops.gather(params, ids)
 result = array_ops.gather(temp_result, idx)
 ```
+  + embedding_lookup 函数中的 ids 索引仅支持 int32, int64 类型，不支持string类型。所以针对 PartionedVariable 并且 string key 的情况下，需要重新实现一个 embedding_lookup_str_key 函数
 
 ## 导入导出相关
 * Variable, ResourceVariable 的导入导出可以参考 https://github.com/zengfancy/tf_notes/blob/master/save_and_restore.md
