@@ -42,6 +42,16 @@ class BaseSaverBuilder:
           tensors=tensors,
           tensor_slices=tensor_slices)
           
+  def restore_op(self, filename_tensor, saveable, preferred_shard):
+    tensors = []
+    for spec in saveable.specs:
+      tensors.append(
+          io_ops.restore_v2(
+              filename_tensor,
+              [spec.name],
+              [spec.slice_spec],
+              [spec.dtype])[0])
+              
   def _AddSaveOps(self, filename_tensor, saveables):
     save = self.save_op(filename_tensor, saveables)
     return control_flow_ops.with_dependencies([save], filename_tensor)
